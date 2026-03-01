@@ -1,23 +1,12 @@
 import sys
-import numpy as np
-from cortex import CortexClient, DistanceMetric
-from cortex.filters import Filter, Field
-import torch.nn.functional as F
 
 from google import genai
 
 import os
 import json
 
-from torch import Tensor
-from transformers import AutoTokenizer, AutoModel
-from sentence_transformers import SentenceTransformer
-
-import requests
-import urllib.parse
-
 from eventregistry import *
-import time, datetime
+import time
 
 # Configuration, if user provided an argument or not for a different URL
 SERVER = sys.argv[1] if len(sys.argv) > 1 else "localhost:50051"
@@ -77,12 +66,6 @@ def main():
 
     print(article_titles)
 
-    model = SentenceTransformer("intfloat/e5-small-v2")
-    # need to put the word passage: in front of each summary
-    embeddings = model.encode(
-        article_titles, normalize_embeddings=True
-    )  # normalized so cosine-similarity is 0
-
     output_dir = "articles_output"
     os.makedirs(output_dir, exist_ok=True)
 
@@ -108,35 +91,35 @@ def main():
     print("Files written successfully.")
 
 
-    # BATCH_SIZE = 3
-    # client = genai.Client()
+    BATCH_SIZE = 3
+    client = genai.Client()
 
-    # for start_idx in range(0, len(article_bodies), BATCH_SIZE):
-    #     batch = article_bodies[start_idx : start_idx + BATCH_SIZE]
+    for start_idx in range(0, len(article_bodies), BATCH_SIZE):
+        batch = article_bodies[start_idx : start_idx + BATCH_SIZE]
     
-    #     # build a single prompt for the batch
-    #     batch_prompt = ""
-    #     for j, body in enumerate(batch):
-    #         batch_prompt += (
-    #             f"Article {j+1}:\n"
-    #             f"Summarize the following article body in exactly two sentences. The summary must describe only the outcome or result of the AI-related action discussed. Do not include commentary, explanations, formatting, or any text outside the two sentences. Respond with only the two sentences and nothing else."
-    #             f":\n{body}\n\n"
-    #         )
+        # build a single prompt for the batch
+        batch_prompt = ""
+        for j, body in enumerate(batch):
+            batch_prompt += (
+                f"Article {j+1}:\n"
+                f"Summarize the following article body in exactly two sentences. The summary must describe only the outcome or result of the AI-related action discussed. Do not include commentary, explanations, formatting, or any text outside the two sentences. Respond with only the two sentences and nothing else."
+                f":\n{body}\n\n"
+            )
         
-    #     # single API call for the batch
-    #     response = client.models.generate_content(
-    #         model="gemini-2.5-flash",
-    #         contents=batch_prompt
-    #     )
+        # single API call for the batch
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=batch_prompt
+        )
     
-    # # assuming the model returns all summaries separated by newlines, one per article
-    #     if (response.text):
-    #         summaries = response.text.strip().split("\n\n")  # or another delimiter if needed
-    #         article_body_summaries.extend(summaries)
+    # assuming the model returns all summaries separated by newlines, one per article
+        if (response.text):
+            summaries = response.text.strip().split("\n\n")  # or another delimiter if needed
+            article_body_summaries.extend(summaries)
 
-    #     time.sleep(12)  # ensures max 5 requests/min
+        time.sleep(12)  # ensures max 5 requests/min
 
-    # print(article_body_summaries)
+    print(article_body_summaries)
 
 
 if __name__ == "__main__":
