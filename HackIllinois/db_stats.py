@@ -1,15 +1,8 @@
 import sys
-from cortex import CortexClient, DistanceMetric
-
-from typing import Any
 
 import asyncio
 
-from sentence_transformers import SentenceTransformer
-
-from eventregistry import *
-
-from cortex import AsyncCortexClient, DistanceMetric
+from cortex import AsyncCortexClient
 
 SERVER = sys.argv[1] if len(sys.argv) > 1 else "localhost:50051"
 
@@ -17,7 +10,9 @@ COLLECTION = "News_Articles"
 
 
 async def main():
-    async with AsyncCortexClient(SERVER) as client:  # with makes sure this closes properly at the end of the with condition
+    async with (
+        AsyncCortexClient(SERVER) as client
+    ):  # with makes sure this closes properly at the end of the with condition
         version, _ = await client.health_check()
         print(f"\n✓ Connected to {version}")
         count = await client.count(COLLECTION)
@@ -28,7 +23,7 @@ async def main():
         print(f"   Scrolled {len(records)} records")
 
         stats = await client.get_stats(COLLECTION)
-        if (stats):
+        if stats:
             print(f"\n7. Collection stats: {stats.total_vectors} vectors")
 
 
