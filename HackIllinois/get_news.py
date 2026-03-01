@@ -52,7 +52,9 @@ def main():
     article_bodies = []
     article_body_summaries = []
 
-    er = EventRegistry(apiKey="30441313-d1c6-449c-80cf-a3f23f8db180")
+    er_api_key = os.getenv("EVENTREGISTRY_API_KEY")
+
+    er = EventRegistry(apiKey=er_api_key)
 
     # get the USA URI
     usUri = er.getLocationUri(
