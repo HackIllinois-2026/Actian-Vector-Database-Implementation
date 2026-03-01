@@ -17,44 +17,65 @@ Usage:
 """
 
 import sys
-import uuid
 import numpy as np
 from cortex import CortexClient, DistanceMetric
 from cortex.filters import Filter, Field
+import torch.nn.functional as F
 
-# Configuration
+from torch import Tensor
+from transformers import AutoTokenizer, AutoModel
+from sentence_transformers import SentenceTransformer
+
+# Configuration, if user provided an argument or not for a different URL
 SERVER = sys.argv[1] if len(sys.argv) > 1 else "localhost:50051"
 # Use unique name to avoid  file conflicts
-COLLECTION = f"documents_{uuid.uuid4().hex[:8]}"
-DIMENSION = 384  # Typical for small embedding models
+COLLECTION = "News_Articles"
+DIMENSION = 384  # We are using E5-small-v2
 
 
-# Sample documents (in real app, these would be embedded with a model)
-DOCUMENTS = [
-    {"title": "Introduction to Machine Learning", "category": "AI", "year": 2023},
-    {"title": "Deep Learning Fundamentals", "category": "AI", "year": 2023},
-    {"title": "Natural Language Processing", "category": "AI", "year": 2022},
-    {"title": "Computer Vision Techniques", "category": "AI", "year": 2023},
-    {"title": "Database Design Patterns", "category": "Database", "year": 2022},
-    {"title": "SQL Performance Optimization", "category": "Database", "year": 2021},
-    {"title": "NoSQL Data Modeling", "category": "Database", "year": 2023},
-    {"title": "Vector Database Architecture", "category": "Database", "year": 2024},
-    {"title": "Web Development with React", "category": "Web", "year": 2023},
-    {"title": "Backend API Design", "category": "Web", "year": 2022},
-    {"title": "Cloud Native Applications", "category": "Cloud", "year": 2023},
-    {"title": "Kubernetes Best Practices", "category": "Cloud", "year": 2024},
-    {"title": "Security in Modern Applications", "category": "Security", "year": 2023},
-    {"title": "Authentication and Authorization", "category": "Security", "year": 2022},
-    {"title": "Data Privacy and Compliance", "category": "Security", "year": 2024},
+# # Sample documents (in real app, these would be embedded with a model)
+# DOCUMENTS = [
+#     {"title": "Introduction to Machine Learning", "category": "AI", "year": 2023},
+#     {"title": "Deep Learning Fundamentals", "category": "AI", "year": 2023},
+#     {"title": "Natural Language Processing", "category": "AI", "year": 2022},
+#     {"title": "Computer Vision Techniques", "category": "AI", "year": 2023},
+#     {"title": "Database Design Patterns", "category": "Database", "year": 2022},
+#     {"title": "SQL Performance Optimization", "category": "Database", "year": 2021},
+#     {"title": "NoSQL Data Modeling", "category": "Database", "year": 2023},
+#     {"title": "Vector Database Architecture", "category": "Database", "year": 2024},
+#     {"title": "Web Development with React", "category": "Web", "year": 2023},
+#     {"title": "Backend API Design", "category": "Web", "year": 2022},
+#     {"title": "Cloud Native Applications", "category": "Cloud", "year": 2023},
+#     {"title": "Kubernetes Best Practices", "category": "Cloud", "year": 2024},
+#     {"title": "Security in Modern Applications", "category": "Security", "year": 2023},
+#     {"title": "Authentication and Authorization", "category": "Security", "year": 2022},
+#     {"title": "Data Privacy and Compliance", "category": "Security", "year": 2024},
+# ]
+
+
+# def simulate_embedding(text: str, dim: int = DIMENSION) -> list[float]:
+#     """Simulate text embedding (in real app, use a model like sentence-transformers)."""
+#     np.random.seed(hash(text) % 2**32)
+#     vec = np.random.randn(dim).astype(np.float32)
+#     vec = vec / np.linalg.norm(vec)
+#     return vec.tolist()
+
+model = SentenceTransformer("intfloat/e5-small-v2")
+name = input("Please input a passage: ")
+while (name !=)
+
+
+input_text = [
+    "passage: That is a happy person",
+    "passage: That is a happy dog",
+    "query: That is a very happy person",
+    "query: Today is a sunny day"
 ]
+embeddings = model.encode(input_text, normalize_embeddings=True) #normalized so cosine-similarity is 0
 
 
-def simulate_embedding(text: str, dim: int = DIMENSION) -> list[float]:
-    """Simulate text embedding (in real app, use a model like sentence-transformers)."""
-    np.random.seed(hash(text) % 2**32)
-    vec = np.random.randn(dim).astype(np.float32)
-    vec = vec / np.linalg.norm(vec)
-    return vec.tolist()
+# Each input text should start with "query: " or "passage: ".
+
 
 
 def main():
